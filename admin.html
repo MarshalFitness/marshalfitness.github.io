@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Marshal Fitness Admin</title>
+  <link rel="icon" href="assets/logo.png">
+  <style>
+    :root{--bg:#f4f4f5;--card:#fff;--ink:#18181b;--muted:#71717a;--line:#e4e4e7;--accent:#e0392b;--ok:#15803d;--blue:#1d4ed8}
+    *{box-sizing:border-box}
+    body{margin:0;font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+    header{background:#0b0b0c;color:#fff;padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+    header img{width:34px;height:34px;border-radius:8px;background:#fff}
+    header h1{font-size:17px;margin:0;flex:1}
+    header a,header button{color:#fff;font:inherit;font-size:14px;background:none;border:1px solid #444;border-radius:8px;padding:6px 10px;cursor:pointer;text-decoration:none}
+    main{max-width:1000px;margin:0 auto;padding:16px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+    .tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px}
+    .tabs button{flex:0 0 auto;font:inherit;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:8px 14px;cursor:pointer}
+    .tabs button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+    .pill{display:inline-block;min-width:20px;text-align:center;background:var(--accent);color:#fff;border-radius:999px;font-size:12px;padding:1px 6px;margin-inline-start:4px}
+    label{display:grid;gap:4px;font-size:13px;color:var(--muted);margin-bottom:10px}
+    input,select,textarea{font:inherit;color:var(--ink);padding:9px 10px;border:1px solid #d4d4d8;border-radius:9px;background:#fff;width:100%}
+    textarea{min-height:64px;resize:vertical}
+    .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    @media(max-width:640px){.grid3,.grid2{grid-template-columns:1fr}}
+    .btn{font:inherit;border:0;border-radius:9px;padding:9px 14px;cursor:pointer;background:var(--ink);color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+    .btn.light{background:#e4e4e7;color:var(--ink)}
+    .btn.red{background:var(--accent)}
+    .btn.green{background:#16a34a}
+    .btn.small{padding:6px 10px;font-size:13px}
+    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .muted{color:var(--muted);font-size:13px}
+    .req{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;display:grid;gap:6px}
+    .req.new{border-color:var(--accent);background:#fff5f4}
+    .req b{font-size:16px}
+    .req .msg{white-space:pre-wrap;font-size:13px;color:#3f3f46;background:#fafafa;border-radius:8px;padding:8px}
+    .req-no{display:inline-block;padding:2px 10px;border-radius:999px;background:#18181b;color:#fff;font-weight:800;font-size:13px;letter-spacing:.02em;direction:ltr}
+    .req-kind{display:inline-block;padding:2px 8px;border-radius:999px;background:#e4e4e7;color:#3f3f46;font-size:12px;font-weight:700}
+    .req-items{margin:0;padding-inline-start:20px;font-size:14px}
+    .req-items li{margin:2px 0}
+    .plist{display:grid;gap:8px}
+    .prow{display:grid;grid-template-columns:56px 1fr auto;gap:10px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:8px}
+    .prow img{width:56px;height:56px;object-fit:cover;border-radius:8px;background:#eee}
+    .prow.hid{opacity:.5}
+    .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px;z-index:9;display:none}
+    .login{max-width:380px;margin:40px auto}
+    .err{color:var(--accent);font-size:14px}
+    .preview{width:120px;height:120px;object-fit:cover;border-radius:10px;border:1px solid var(--line);background:#eee}
+    details summary{cursor:pointer;font-weight:600;padding:6px 0}
+    h2{margin:0 0 12px;font-size:18px}
+    h3{margin:14px 0 8px;font-size:15px}
+    .lang-tag{font-size:11px;background:#e4e4e7;border-radius:5px;padding:1px 5px;color:#3f3f46}
+    /* version 20 */
+    .checker{background-color:#fff;background-image:linear-gradient(45deg,#e4e4e7 25%,transparent 25%),linear-gradient(-45deg,#e4e4e7 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#e4e4e7 75%),linear-gradient(-45deg,transparent 75%,#e4e4e7 75%);background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0}
+    .cam-box{display:flex;gap:12px;align-items:center;flex-wrap:wrap;border:1px dashed #d4d4d8;border-radius:12px;padding:10px;margin:10px 0}
+    .cam-prev{width:140px;height:140px;border-radius:10px;border:1px solid var(--line);display:grid;place-items:center;overflow:hidden}
+    .cam-prev img{max-width:100%;max-height:100%;object-fit:contain}
+    .cam-prev.dark{background:#18181b}
+    .tour-thumbs{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:12px}
+    .tour-thumb{flex:0 0 auto;position:relative;width:78px;padding:0;border:2px solid transparent;border-radius:10px;background:none;cursor:pointer;overflow:hidden}
+    .tour-thumb img{display:block;width:100%;height:104px;object-fit:cover}
+    .tour-thumb span{position:absolute;left:4px;top:4px;background:rgba(0,0,0,.7);color:#fff;font-size:11px;font-weight:700;border-radius:6px;padding:1px 6px}
+    .tour-thumb.on{border-color:var(--accent)}
+    .tour-thumb.hid img{opacity:.35}
+    .tour-edit{display:grid;grid-template-columns:minmax(260px,420px) 1fr;gap:16px;align-items:start}
+    @media(max-width:760px){.tour-edit{grid-template-columns:1fr}}
+    .tour-pic{position:relative;border-radius:12px;overflow:hidden;cursor:crosshair;user-select:none}
+    .tour-pic img{display:block;width:100%;pointer-events:none}
+    .tdot{position:absolute;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;border:3px solid #fff;background:#f2b807;color:#111;font-weight:800;font-size:13px;cursor:grab;box-shadow:0 2px 8px rgba(0,0,0,.5);padding:0;touch-action:none}
+    .tdot.on{outline:3px solid var(--accent)}
+    .tdot-row{display:grid;grid-template-columns:28px 1fr 1.4fr auto;gap:8px;align-items:center;margin-bottom:8px}
+    .tdot-row b{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:#f2b807;color:#111;font-size:13px}
+    .tdot-row select{margin:0}
+  </style>
+</head>
+<body>
+  <header>
+    <img src="assets/logo.png" alt="">
+    <h1>Marshal Fitness · Admin</h1>
+    <a href="index.html">&larr; Back to Website</a>
+    <button id="logout" hidden>Log out</button>
+  </header>
+
+  <main>
+    <section class="card login" id="loginBox">
+      <h2>Admin login</h2>
+      <form id="loginForm">
+        <label>Email<input id="email" type="email" autocomplete="username" required></label>
+        <label>Password<input id="password" type="password" autocomplete="current-password" required></label>
+        <p class="err" id="loginErr" hidden></p>
+        <button class="btn" type="submit">Log in</button>
+      </form>
+    </section>
+
+    <div id="app" hidden>
+      <nav class="tabs" id="tabs">
+        <button data-tab="requests" class="on">Customer requests <span class="pill" id="newCount" hidden>0</span></button>
+        <button data-tab="products">Products &amp; prices</button>
+        <button data-tab="shop">Shop info</button>
+        <button data-tab="texts">Website texts</button>
+        <button data-tab="faq">FAQ &amp; payment</button>
+        <button data-tab="offer">Offer &amp; brands</button>
+        <button data-tab="numbers">Numbers</button>
+        <button data-tab="tour">Showroom tour</button>
+      </nav>
+
+      <section class="card" data-panel="requests">
+        <div class="row" style="justify-content:space-between;margin-bottom:10px">
+          <h2 style="margin:0">Customer requests</h2>
+          <div class="row">
+            <input id="reqSearch" type="search" placeholder="Search name, phone or MF-number…" style="width:auto;min-width:220px">
+            <select id="reqFilter" style="width:auto"><option value="all">All</option><option value="new">New only</option><option value="done">Done</option></select>
+          </div>
+        </div>
+        <div id="reqList"><p class="muted">Loading…</p></div>
+      </section>
+
+      <section class="card" data-panel="products" hidden>
+        <div class="row" style="justify-content:space-between;margin-bottom:10px">
+          <h2 style="margin:0">Products &amp; prices</h2>
+          <button class="btn" id="addProduct">+ Add new product</button>
+        </div>
+        <div id="importBox" hidden class="card" style="background:#fffbeb">
+          <p style="margin-top:0"><b>First time only:</b> copy your current products into the database so you can edit them here.</p>
+          <button class="btn green" id="importBtn">Copy my current products</button>
+        </div>
+        <div id="editor" hidden></div>
+        <input id="pSearch" placeholder="Search products (name or item number)…" style="margin-bottom:10px">
+        <div class="plist" id="plist"></div>
+      </section>
+
+      <section class="card" data-panel="shop" hidden>
+        <h2>Shop info</h2>
+        <form id="shopForm"></form>
+      </section>
+
+      <section class="card" data-panel="texts" hidden>
+        <h2>Website texts</h2>
+        <p class="muted">Leave a box empty to keep the original text. Click "Save texts" at the bottom when done.</p>
+        <input id="textSearch" placeholder="Search a text…" style="margin-bottom:12px">
+        <div id="textList"></div>
+        <button class="btn" id="saveTexts">Save texts</button>
+      </section>
+
+      <section class="card" data-panel="faq" hidden>
+        <h2>FAQ (common questions)</h2>
+        <div id="faqList"></div>
+        <div class="row"><button class="btn light" id="addFaq">+ Add question</button><button class="btn" id="saveFaq">Save FAQ</button></div>
+        <h2 style="margin-top:24px">Payment methods</h2>
+        <div id="payList"></div>
+        <div class="row"><button class="btn light" id="addPay">+ Add payment method</button><button class="btn" id="savePay">Save payment methods</button></div>
+      </section>
+
+      <section class="card" data-panel="offer" hidden>
+        <h2>Offer bar (top of the website)</h2>
+        <form id="offerForm"></form>
+        <h2 style="margin-top:24px">Brands strip</h2>
+        <p class="muted">Write each brand name. Adding a logo is optional; without a logo the name is shown.</p>
+        <div class="plist" id="brandList"></div>
+        <div class="row" style="margin-top:10px"><button class="btn light" id="addBrand">+ Add brand</button><button class="btn" id="saveBrands">Save brands</button></div>
+      </section>
+
+      <section class="card" data-panel="tour" hidden>
+        <h2>Showroom tour</h2>
+        <p class="muted">1. Choose a photo. 2. Tap on the photo to add a gold dot. 3. Choose what the dot shows (a category, a gym series or one product). Drag a dot to move it. Then press "Save tour".</p>
+        <div class="tour-thumbs" id="tourThumbs"></div>
+        <div id="tourEditor"><p class="muted">Loading…</p></div>
+        <div class="row" style="margin-top:14px"><button class="btn" id="saveTour">Save tour</button><button class="btn light" id="resetTour">Use the original dots again</button></div>
+      </section>
+
+      <section class="card" data-panel="numbers" hidden>
+        <div class="row" style="justify-content:space-between;margin-bottom:10px">
+          <h2 style="margin:0">Numbers</h2>
+          <div class="row">
+            <select id="numRange" style="width:auto"><option value="7">Last 7 days</option><option value="30">Last 30 days</option><option value="all">All time</option></select>
+            <button class="btn light small" id="numRefresh">Refresh</button>
+          </div>
+        </div>
+        <div id="numBody"></div>
+      </section>
+    </div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="content.js"></script>
+  <script src="gym-content.js"></script>
+  <script src="cutouts.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
