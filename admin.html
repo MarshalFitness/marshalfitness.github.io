@@ -74,7 +74,27 @@
     .tdot-row{display:grid;grid-template-columns:28px 1fr 1.4fr auto;gap:8px;align-items:center;margin-bottom:8px}
     .tdot-row b{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:#f2b807;color:#111;font-size:13px}
     .tdot-row select{margin:0}
+    /* version 21 */
+    .check{display:flex;gap:8px;align-items:center;color:inherit;font-size:14px}
+    .check input{width:auto}
+    .hd-row{border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px;display:grid;gap:8px}
+    .post-grid{display:grid;grid-template-columns:minmax(260px,1fr) minmax(260px,1fr);gap:16px;align-items:start}
+    @media(max-width:760px){.post-grid{grid-template-columns:1fr}}
+    .post-grid select[size]{height:auto;margin-top:-4px}
+    .post-prev{position:sticky;top:10px}
+    .post-canvas{display:block;width:100%;height:auto;border-radius:12px;border:1px solid var(--line);background:#111}
+    .inv-row{grid-template-columns:auto 1fr auto}
+    .inv-items{display:grid;gap:6px}
+    .inv-item{display:grid;grid-template-columns:minmax(0,1fr) 70px 110px 100px 40px;gap:8px;align-items:center}
+    .inv-item select{margin-bottom:4px}
+    .inv-head{font-size:12px;color:var(--muted);font-weight:700}
+    @media(max-width:640px){.inv-item{grid-template-columns:1fr 70px 90px}.inv-item>b,.inv-head span:nth-child(4){display:none}}
+    .inv-totals{display:grid;gap:4px;justify-content:end;margin:12px 0;font-size:15px}
+    .inv-totals div{display:flex;gap:18px;justify-content:space-between;min-width:240px}
+    .inv-grand{font-size:18px;border-top:2px solid var(--ink);padding-top:4px}
   </style>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&amp;family=Noto+Sans+Arabic:wght@400;600;700;800;900&amp;display=swap" media="print" onload="this.media='all'">
 </head>
 <body>
   <header>
@@ -105,6 +125,9 @@
         <button data-tab="offer">Offer &amp; brands</button>
         <button data-tab="numbers">Numbers</button>
         <button data-tab="tour">Showroom tour</button>
+        <button data-tab="holidays">Holidays</button>
+        <button data-tab="posts">Post maker</button>
+        <button data-tab="invoices">Invoices</button>
       </nav>
 
       <section class="card" data-panel="requests">
@@ -171,6 +194,31 @@
         <div class="row" style="margin-top:14px"><button class="btn" id="saveTour">Save tour</button><button class="btn light" id="resetTour">Use the original dots again</button></div>
       </section>
 
+      <section class="card" data-panel="holidays" hidden>
+        <h2>Holiday looks</h2>
+        <p class="muted">On these days the website shows a greeting and a small drawing, by itself. Untick a day to skip it. You can add an offer text for each day. "Preview" shows the look now.</p>
+        <div id="hdBody"><p class="muted">Loading…</p></div>
+        <button class="btn" id="saveHd" style="margin-top:10px">Save holidays</button>
+      </section>
+
+      <section class="card" data-panel="posts" hidden>
+        <h2>Post maker</h2>
+        <p class="muted">Choose a product. A picture with your logo and WhatsApp number is made. Download it or share it to Instagram / WhatsApp Status.</p>
+        <div id="postBody"></div>
+      </section>
+
+      <section class="card" data-panel="invoices" hidden>
+        <div class="row" style="justify-content:space-between;margin-bottom:10px">
+          <h2 style="margin:0">Invoices (US dollars)</h2>
+          <div class="row">
+            <input id="invSearch" type="search" placeholder="Search number, name or phone…" style="width:auto;min-width:220px">
+            <button class="btn" id="newInvoice">+ New invoice</button>
+          </div>
+        </div>
+        <div id="invEditor" hidden></div>
+        <div class="plist" id="invList"><p class="muted">Loading…</p></div>
+      </section>
+
       <section class="card" data-panel="numbers" hidden>
         <div class="row" style="justify-content:space-between;margin-bottom:10px">
           <h2 style="margin:0">Numbers</h2>
@@ -186,13 +234,16 @@
 
   <div class="toast" id="toast"></div>
 
-  <script src="content.js"></script>
-  <script src="gym-content.js"></script>
-  <script src="cutouts.js"></script>
+  <script src="content.js?v=21"></script>
+  <script src="gym-content.js?v=21"></script>
+  <script src="cutouts.js?v=21"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-  <script src="firebase-config.js"></script>
-  <script src="admin.js"></script>
+  <script src="firebase-config.js?v=21"></script>
+  <script src="admin.js?v=21"></script>
+  <script src="holiday-dates.js?v=21"></script>
+  <script src="pdfmaker.js?v=21"></script>
+  <script src="admin21.js?v=21"></script>
 </body>
 </html>

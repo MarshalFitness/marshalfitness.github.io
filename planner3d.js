@@ -145,7 +145,7 @@
   /* ---------- scene ---------- */
   function themeColors() {
     var cs = getComputedStyle(root);
-    var light = root.getAttribute("data-theme") === "light";
+    var light = String(cs.colorScheme || cs.getPropertyValue("color-scheme") || "").trim() === "light"; // light, ice
     return {
       bg: light ? 0xeeeeea : 0x101012,
       floor: light ? 0xf7f6f2 : 0x1d1d21,

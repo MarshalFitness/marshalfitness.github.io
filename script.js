@@ -9,7 +9,8 @@
   var PRODUCTS = window.PRODUCTS;
   var LANG_KEY = "marshal-lang";
   var THEME_KEY = "marshal-theme";
-  var THEMES = { dark: "#0b0b0c", light: "#ffffff", gold: "#0a0a0a" };
+  var THEMES = { dark: "#0b0b0c", light: "#ffffff", gold: "#0a0a0a",
+    cyber: "#120a2a", lime: "#0a0f0a", ice: "#eef5fb", army: "#1f2318", royal: "#0b1a3a", coffee: "#2b1d16" };
   var root = document.documentElement;
 
   var WA_ICON =
@@ -21,6 +22,13 @@
 
   function productKey(p) {
     return String(p.image || "").replace(/\.[a-z0-9]+$/i, "").replace(/[^a-z0-9_-]+/gi, "-");
+  }
+
+  // the built-in hero photo has small and big versions (same choice as in index.html)
+  function heroSrc(src) {
+    if (src !== "assets/hero-rooftop.jpg") return src;
+    var w = Math.min(window.screen ? window.screen.width : 9999, window.innerWidth || 9999) * (window.devicePixelRatio || 1);
+    return w > 1000 ? "assets/hero-rooftop-1600.webp" : "assets/hero-rooftop-800.webp";
   }
 
   var lang = pickLanguage();
@@ -196,11 +204,13 @@
     var heroSection = byId("hero");
     var heroBg = byId("heroBg");
     if (heroSection && heroBg) {
+      // remember the photo, so the next visit can start loading it at once (index.html)
+      try { window.localStorage.setItem("mf-hero", S.heroImage || "none"); } catch (e) { /* ignore */ }
       if (S.heroImage) {
-        heroBg.style.backgroundImage = "url('" + S.heroImage + "')";
+        heroBg.style.backgroundImage = "url('" + heroSrc(S.heroImage) + "')";
         heroSection.classList.add("hero-photo");
       } else {
-        heroBg.style.backgroundImage = "";
+        heroBg.style.backgroundImage = "none";
         heroSection.classList.remove("hero-photo");
       }
     }

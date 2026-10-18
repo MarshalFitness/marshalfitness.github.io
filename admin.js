@@ -85,6 +85,11 @@
     loadOfferAndBrands();
     loadTour();
     seedViews();
+    // version 21 (admin21.js): holidays, post maker, invoices.
+    // admin21.js may load after the login is restored, so it also checks MF_ADMIN_STARTED itself.
+    window.MF_ADMIN_STARTED = true;
+    (window.MF_ADMIN_START || []).forEach(function (fn) { try { fn(); } catch (e) { console.error(e); } });
+    window.MF_ADMIN_START = [];
   }
 
   /* ---------- 1. customer requests ---------- */
@@ -169,6 +174,7 @@
           el("button", { class: "btn light small", text: done ? "Mark as new" : "Mark as done", onclick: function () {
             db.collection("requests").doc(r.id).update({ status: done ? "new" : "done" }).catch(fail);
           } }),
+          el("button", { class: "btn light small", text: "Make invoice", onclick: function () { if (window.MF_ADMIN_INVOICE) window.MF_ADMIN_INVOICE(r); } }),
           el("button", { class: "btn light small", text: "Delete", onclick: function () {
             if (confirm("Delete this request?")) db.collection("requests").doc(r.id).delete().catch(fail);
           } })
@@ -204,6 +210,19 @@
   function imgSrc(p) { return p.imageData || ("assets/" + p.image); }
 
   function seriesName(id) { var s = (window.GYM_SERIES || []).filter(function (x) { return x.id === id; })[0]; return s ? s.name : ""; }
+
+  // version 21: machine types for the exercises (same names as in exercises.js)
+  var EX_TYPES = [["", "Automatic"], ["none", "No exercises"], ["treadmill", "Treadmill"], ["bike", "Exercise bike"], ["rower", "Rowing machine (cardio)"],
+    ["barbell", "Barbell"], ["plates", "Weight plates"], ["dumbbells", "Dumbbells"], ["bench", "Bench"], ["mat", "Yoga mat"], ["ball", "Exercise ball"],
+    ["bands", "Resistance bands"], ["handle", "Band handle"], ["belt", "Weighted belt"], ["ankle", "Ankle strap"],
+    ["chestpress", "Chest press"], ["incline", "Incline press"], ["decline", "Decline press"], ["pecfly", "Pec fly / rear delt"],
+    ["shoulderpress", "Shoulder press"], ["lateral", "Lateral raise"], ["chestshoulder", "Chest + shoulder press"],
+    ["pulldown", "Lat pulldown"], ["row", "Row"], ["pullrow", "Pulldown + row"], ["dip", "Dip"], ["assist", "Assisted pull-up / dip"],
+    ["biceps", "Biceps curl"], ["triceps", "Triceps"], ["bitri", "Biceps + triceps"], ["legext", "Leg extension"],
+    ["legcurlprone", "Lying leg curl"], ["legcurlseated", "Seated leg curl"], ["legextcurl", "Leg extension + curl"],
+    ["legpress", "Leg press"], ["squatmachine", "Squat machine"], ["smith", "Smith machine"], ["calf", "Calf raise"],
+    ["adductor", "Inner thigh (adductor)"], ["abductor", "Outer hip (abductor)"], ["addabd", "Adductor + abductor"],
+    ["glute", "Glute machine"], ["abback", "Abs + back extension"], ["abs", "Abs machine"], ["backext", "Back extension"], ["cable", "Cable machine"]];
   $("pSearch").addEventListener("input", renderProducts);
   function renderProducts() {
     var box = $("plist");
@@ -268,8 +287,8 @@
     [{ id: "", name: "No series" }].concat(window.GYM_SERIES || []).forEach(function (s) { var o = el("option", { value: s.id, text: s.name }); if ((p.series || "") === s.id) o.selected = true; series.appendChild(o); });
     var price = input(p.price, { placeholder: "e.g. 450,000 IQD (leave empty to hide)" });
     var video = input(p.video, { placeholder: "https://youtube.com/... or https://tiktok.com/... (optional)", type: "url" });
-    var sizeW = input(p.sizeW, { type: "number", min: "1", max: "1000", placeholder: "e.g. 85 (empty = automatic)" });
-    var sizeL = input(p.sizeL, { type: "number", min: "1", max: "1000", placeholder: "e.g. 195 (empty = automatic)" });
+    var sizeW = input(p.sizeW || "", { type: "number", min: "1", max: "1000", placeholder: "e.g. 85 (empty = automatic)" });
+    var sizeL = input(p.sizeL || "", { type: "number", min: "1", max: "1000", placeholder: "e.g. 195 (empty = automatic)" });
     var badge = el("select");
     [["", "None"], ["new", "New"], ["popular", "Popular"]].forEach(function (b) { var o = el("option", { value: b[0], text: b[1] }); if ((p.badge || "") === b[0]) o.selected = true; badge.appendChild(o); });
     var stock = el("select");
@@ -283,6 +302,9 @@
     var starBefore = p.show === true || (p.show !== false && p.badge === "popular");
     var star = el("input", { type: "checkbox" }); star.checked = starBefore;
     var cam = cameraBox(p);
+    // version 21: which exercises the product window shows ("Automatic" = from the name)
+    var ex = el("select");
+    EX_TYPES.forEach(function (t) { var o = el("option", { value: t[0], text: t[1] }); if ((p.ex || "") === t[0]) o.selected = true; ex.appendChild(o); });
     file.addEventListener("change", function () {
       if (!file.files[0]) return;
       resizeImage(file.files[0]).then(function (data) { newImage = data; preview.src = data; cam.onNewPhoto(data); }).catch(fail);
@@ -310,6 +332,7 @@
       // star product: only write it when it is different from what the website does now
       var starAfter = p.show === true || (p.show !== false && badge.value === "popular");
       if (star.checked !== starAfter) doc.show = star.checked;
+      if (ex.value) doc.ex = ex.value; else if (p.ex) doc.ex = firebase.firestore.FieldValue.delete();
       var cs = cam.state;
       doc.cutOff = !!cs.off;
       if (cs.cut) doc.cut = cs.cut;
@@ -341,6 +364,7 @@
       el("div", { class: "grid2" }, [field("Room planner size: width in cm", sizeW), field("Room planner size: length in cm", sizeL)]),
       el("label", { style: "display:flex;gap:8px;align-items:center;color:inherit" }, [hidden, "Hide this product from the website"]),
       el("label", { style: "display:flex;gap:8px;align-items:center;color:inherit" }, [star, "Show page: this is a star product (big moving page + home page row)"]),
+      field("Exercises in the product window (\"Automatic\" chooses from the name)", ex),
       el("h3", { text: "Camera photo (\"See it in your room\")" }),
       cam.node,
       el("div", { class: "row", style: "align-items:flex-end" }, [preview, field("Photo" + (isNew ? "" : " (choose only to change it)"), file)]),
@@ -936,4 +960,11 @@
     var b = e.target.closest("button[data-tab]");
     if (b && b.getAttribute("data-tab") === "numbers") loadNumbers();
   });
+
+  // version 21: helpers for admin21.js
+  window.MF_ADMIN_API = {
+    db: db, toast: toast, fail: fail, el: el, field: field, input: input, textarea: textarea, multi: multi,
+    imgSrc: imgSrc, seriesName: seriesName, catName: catName, waNumber: waNumber,
+    products: function () { return products; }
+  };
 })();
