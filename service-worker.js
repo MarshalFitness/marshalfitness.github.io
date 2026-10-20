@@ -1,11 +1,11 @@
-/* Marshal Fitness — service worker (version 21).
+/* Marshal Fitness — service worker (version 22).
    - The page (index.html): from the internet first; if the internet is slow or down,
      the saved copy is used after a short wait.
    - Our own files (scripts, styles, photos): the saved copy is shown at once and
      updated in the background, so the site opens fast on slow internet.
    - Fonts and the Firebase program files: saved once (their address never changes).
    Change CACHE for every new version, and keep the ?v= number the same as in index.html. */
-const V = "21";
+const V = "22";
 const CACHE = "marshal-fitness-v" + V;
 const EXT = "marshal-fitness-ext";
 const PAGE_WAIT = 3500;
@@ -13,8 +13,9 @@ const APP = ["script.js", "features.js", "quotation.js", "request-form.js", "ext
   "shop.js", "finder.js", "app.js", "helper.js", "planner.js",
   "cutouts.js", "v20.js", "tour.js", "camera.js", "show.js", "planner3d.js", "photosearch.js",
   "v21.js", "holiday-dates.js", "holidays.js", "exfigure.js", "exercises.js", "pdfmaker.js", "catalog.js",
-  "content.js", "gym-content.js", "thumbs.js", "firebase-config.js", "live.js",
-  "styles.css", "features.css", "v19.css", "v20.css", "v21.css"];
+  "v22.js", "gym3d.js", "rooms-data.js", "rooms.js", "gymplan.js", "savings.js", "tradein.js", "designer.js", "invoicepdf.js", "account.js",
+  "content.js", "content22.js", "texts22.js", "gym-content.js", "thumbs.js", "firebase-config.js", "live.js",
+  "styles.css", "features.css", "v19.css", "v20.css", "v21.css", "v22.css"];
 const CORE = ["/", "/index.html", "/manifest.webmanifest", "/favicon.png", "/assets/logo.png", "/assets/icon-512.png"]
   .concat(APP.map((f) => "/" + f + "?v=" + V));
 

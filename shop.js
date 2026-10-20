@@ -248,6 +248,7 @@
     storeSaved();
     renderSaved(anchor);
     updateCardStates();
+    savedHooks.forEach(function (fn) { try { fn(saved.slice()); } catch (e) { /* ignore */ } });
   }
 
   function renderSaved(anchor) {
@@ -465,6 +466,22 @@
   if (barBasket) barBasket.addEventListener("click", function () { openBasket(barBasket); });
 
   M.openBasket = openBasket;
+  // version 22: read the basket / saved list, and merge saved items from the customer's account
+  M.basketItems = function () { var out = []; basket.forEach(function (q, id) { out.push({ id: id, qty: q }); }); return out; };
+  M.savedItems = function () { return saved.slice(); };
+  var savedHooks = [];
+  M.onSavedChange = function (fn) { savedHooks.push(fn); };
+  M.mergeSaved = function (ids) {
+    var changed = false;
+    (ids || []).forEach(function (id) {
+      if (typeof id === "string" && M.productByImage(id) && saved.indexOf(id) === -1) { saved.push(id); changed = true; }
+    });
+    if (!changed) return;
+    saved = saved.slice(0, 40);
+    storeSaved();
+    renderSaved();
+    updateCardStates();
+  };
   M.lightboxOrigin = function () { return originOpener; };
   M.addToBasket = addToBasket;
 

@@ -42,6 +42,9 @@
     return /\bbarbell\b/.test(name);
   }
 
+  // version 22: the gym 3D view (gym3d.js) uses the same library and heights
+  M.three = { load: function () { return load(); }, heightOf: heightOf, lying: lying };
+
   /* ---------- the 2D / 3D switch inside the planner ---------- */
   function ensureUi() {
     var data = M.plannerData();

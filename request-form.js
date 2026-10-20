@@ -137,6 +137,7 @@
       item: opts.item || "",
       image: opts.image || "",
       items: opts.items || null,
+      extra: opts.extra || null,
       kind: opts.kind || "product",
       onSent: typeof opts.onSent === "function" ? opts.onSent : null
     };
@@ -216,12 +217,30 @@
         status: "new",
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       };
+      // version 22: logged-in customers see their requests in "My Marshal"
+      var user = window.MF_USER && window.MF_USER();
+      var userDb = user && user.uid && window.MF_USER_DB ? window.MF_USER_DB() : null;
+      if (userDb) { doc.uid = user.uid; if (user.email) doc.email = String(user.email).toLowerCase().slice(0, 120); }
+      if (pending.extra && typeof pending.extra === "object") {
+        Object.keys(pending.extra).forEach(function (k) {
+          if (/^(photos|design|plan|tradein|room|gym)$/.test(k)) doc[k] = pending.extra[k];
+        });
+      }
       if (pending.items) {
         doc.items = pending.items.slice(0, 60).map(function (it) {
           return { name: String(it.name || "").slice(0, 120), no: String(it.no || "").slice(0, 40), qty: Number(it.qty) || 1 };
         });
       }
-      try { window.MF_DB.collection("requests").add(doc).catch(function () { /* WhatsApp already opened */ }); }
+      try {
+        // with the customer login (so it shows in "My Marshal"); if that fails, save it without the account
+        var plain = function () {
+          var d2 = {};
+          Object.keys(doc).forEach(function (k) { if (k !== "uid" && k !== "email") d2[k] = doc[k]; });
+          return window.MF_DB.collection("requests").add(d2);
+        };
+        var save = userDb && userDb !== window.MF_DB ? userDb.collection("requests").add(doc).catch(plain) : window.MF_DB.collection("requests").add(doc);
+        save.catch(function () { /* WhatsApp already opened */ });
+      }
       catch (e2) { /* WhatsApp already opened */ }
     }
     var done = pending;
