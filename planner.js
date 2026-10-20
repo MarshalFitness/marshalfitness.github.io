@@ -441,6 +441,18 @@
     addItem(p);
   };
   M.onPlannerDraw = function (fn) { drawHooks.push(fn); };
+  // version 22: product floor size (cm), and load a whole room (ready gym rooms)
+  M.plannerSize = sizeOf;
+  M.plannerLoad = function (plan, opener) {
+    if (!plan) return;
+    if (plan.W >= 1 && plan.W <= 30) state.W = Math.round(plan.W * 10) / 10;
+    if (plan.L >= 1 && plan.L <= 30) state.L = Math.round(plan.L * 10) / 10;
+    state.items = (plan.items || []).filter(function (it) { return it && typeof it.id === "string"; }).slice(0, 40)
+      .map(function (it) { return { id: it.id, x: Math.round(it.x || 0), y: Math.round(it.y || 0), rot: it.rot ? 1 : 0 }; });
+    selected = -1;
+    save();
+    open(opener || null);
+  };
   M.plannerData = function () {
     var bad = problems();
     var out = [];

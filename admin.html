@@ -45,6 +45,14 @@
     .prow{display:grid;grid-template-columns:56px 1fr auto;gap:10px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:8px}
     .prow img{width:56px;height:56px;object-fit:cover;border-radius:8px;background:#eee}
     .prow.hid{opacity:.5}
+    .req-extra{display:grid;gap:6px}
+    .req-photos{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .req-photos img{width:96px;height:96px;object-fit:cover;border-radius:10px;border:1px solid var(--line);cursor:zoom-in;background:#f4f4f5}
+    .req-photos img.big{width:100%;height:auto;max-height:80vh;object-fit:contain;cursor:zoom-out}
+    .room-ed{display:grid;gap:8px}
+    .room-items{display:grid;gap:6px}
+    .cust{grid-template-columns:44px 1fr auto}
+    .cust-av{width:40px;height:40px;border-radius:50%;background:#18181b;color:#fff;display:grid;place-items:center;font-weight:800}
     .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:10px;z-index:9;display:none}
     .login{max-width:380px;margin:40px auto}
     .err{color:var(--accent);font-size:14px}
@@ -113,6 +121,8 @@
         <p class="err" id="loginErr" hidden></p>
         <button class="btn" type="submit">Log in</button>
       </form>
+      <p class="muted" style="text-align:center;margin:14px 0 8px">or</p>
+      <button class="btn light" id="googleLogin" type="button" style="width:100%;justify-content:center">Log in with Google</button>
     </section>
 
     <div id="app" hidden>
@@ -128,6 +138,8 @@
         <button data-tab="holidays">Holidays</button>
         <button data-tab="posts">Post maker</button>
         <button data-tab="invoices">Invoices</button>
+        <button data-tab="rooms">Rooms &amp; tools</button>
+        <button data-tab="customers">Customers</button>
       </nav>
 
       <section class="card" data-panel="requests">
@@ -219,6 +231,34 @@
         <div class="plist" id="invList"><p class="muted">Loading…</p></div>
       </section>
 
+      <section class="card" data-panel="rooms" hidden>
+        <h2>Ready gym rooms</h2>
+        <p class="muted">These rooms show on the website under "Ready gym rooms". Customers can add a whole room to the basket, see it in 3D or ask the price. Change names, sizes and products, then press Save.</p>
+        <div id="roomsBody"><p class="muted">Loading…</p></div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn" id="saveRooms">Save rooms</button>
+          <button class="btn light" id="addRoom">+ New room</button>
+          <button class="btn light" id="resetRooms">Use the built-in rooms</button>
+        </div>
+        <h2 style="margin-top:22px">"Home gym vs gym membership" calculator</h2>
+        <p class="muted">The calculator starts with these numbers. Customers can change them. Leave empty to use the built-in numbers (1 $ = 1,400 IQD, gym = 40,000 IQD a month).</p>
+        <div class="grid3">
+          <label>Dollar rate (IQD for 1 $)<input id="moneyRate" type="number" min="1" step="1" placeholder="1400"></label>
+          <label>Gym membership, 1 person, 1 month (IQD)<input id="moneyMember" type="number" min="0" step="1000" placeholder="40000"></label>
+          <span></span>
+        </div>
+        <button class="btn" id="saveMoney" style="margin-top:10px">Save calculator numbers</button>
+      </section>
+
+      <section class="card" data-panel="customers" hidden>
+        <div class="row" style="justify-content:space-between;margin-bottom:10px">
+          <h2 style="margin:0">Customers with "My Marshal" <span class="muted" id="custCount"></span></h2>
+          <input id="custSearch" type="search" placeholder="Search name, email or phone…" style="width:auto;min-width:220px">
+        </div>
+        <p class="muted">People who logged in on the website. To show an invoice in a customer's account, write their email in the invoice.</p>
+        <div class="plist" id="custList"><p class="muted">Loading…</p></div>
+      </section>
+
       <section class="card" data-panel="numbers" hidden>
         <div class="row" style="justify-content:space-between;margin-bottom:10px">
           <h2 style="margin:0">Numbers</h2>
@@ -234,16 +274,19 @@
 
   <div class="toast" id="toast"></div>
 
-  <script src="content.js?v=21"></script>
-  <script src="gym-content.js?v=21"></script>
-  <script src="cutouts.js?v=21"></script>
+  <script src="content.js?v=22"></script>
+  <script src="gym-content.js?v=22"></script>
+  <script src="cutouts.js?v=22"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-  <script src="firebase-config.js?v=21"></script>
-  <script src="admin.js?v=21"></script>
-  <script src="holiday-dates.js?v=21"></script>
-  <script src="pdfmaker.js?v=21"></script>
-  <script src="admin21.js?v=21"></script>
+  <script src="firebase-config.js?v=22"></script>
+  <script src="admin.js?v=22"></script>
+  <script src="holiday-dates.js?v=22"></script>
+  <script src="pdfmaker.js?v=22"></script>
+  <script src="invoicepdf.js?v=22"></script>
+  <script src="admin21.js?v=22"></script>
+  <script src="rooms-data.js?v=22"></script>
+  <script src="admin22.js?v=22"></script>
 </body>
 </html>

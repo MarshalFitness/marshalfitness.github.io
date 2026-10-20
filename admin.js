@@ -58,14 +58,54 @@
       .catch(function () { $("loginErr").textContent = "Wrong email or password."; $("loginErr").hidden = false; });
   });
   $("logout").addEventListener("click", function () { auth.signOut(); });
+  // version 22: log in with Google too (the admin Gmail). Useful if the password stops working.
+  var gBtn = $("googleLogin");
+  if (gBtn) gBtn.addEventListener("click", function () {
+    $("loginErr").hidden = true;
+    var provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: "select_account" });
+    auth.signInWithPopup(provider).catch(function (e) {
+      if (e && (e.code === "auth/popup-closed-by-user" || e.code === "auth/cancelled-popup-request")) return;
+      $("loginErr").textContent = "Google log in did not work. Please use your email and password.";
+      $("loginErr").hidden = false;
+    });
+  });
 
-  var started = false;
+  // version 22: customers have accounts too ("My Marshal", a separate login on the website).
+  // Open the admin tools only for the admin: the database says "no permission" to others
+  // (for example when someone uses "Log in with Google" here with a customer Gmail).
+  function isAdminLogin() {
+    return db.collection("requests").limit(1).get().then(function () { return true; }, function (e) {
+      var code = String((e && e.code) || "") + " " + String((e && e.message) || "");
+      return !/permission/i.test(code); // no internet etc.: open as before
+    });
+  }
+  var started = false, authTurn = 0;
   auth.onAuthStateChanged(function (user) {
-    $("loginBox").hidden = !!user;
-    $("app").hidden = !user;
+    var turn = ++authTurn;
     $("logout").hidden = !user;
-    if (user && !started) { started = true; startApp(); }
-    if (!user && started) location.reload();
+    if (!user) {
+      $("loginBox").hidden = false;
+      $("app").hidden = true;
+      if (started) location.reload();
+      return;
+    }
+    if (started) return;
+    $("loginBox").hidden = true; // checking the account
+    isAdminLogin().then(function (ok) {
+      if (turn !== authTurn || started) return;
+      if (!ok) {
+        $("loginBox").hidden = false;
+        $("app").hidden = true;
+        $("loginErr").textContent = "This account (" + (user.email || "?") + ") is not the admin account. Please log in with the admin email.";
+        $("loginErr").hidden = false;
+        return;
+      }
+      $("loginErr").hidden = true;
+      $("app").hidden = false;
+      started = true;
+      startApp();
+    });
   });
 
   /* ---------- tabs ---------- */
@@ -141,7 +181,7 @@
     var q = $("reqSearch").value.trim().toLowerCase();
     var list = requests.filter(function (r) { return f === "all" || (f === "new" ? r.status !== "done" : r.status === "done"); });
     if (q) list = list.filter(function (r) {
-      return [r.number, r.name, r.phone, r.item].join(" ").toLowerCase().indexOf(q) !== -1;
+      return [r.number, r.name, r.phone, r.item, r.email].join(" ").toLowerCase().indexOf(q) !== -1;
     });
     box.textContent = "";
     if (!list.length) { box.appendChild(el("p", { class: "muted", text: "No requests yet." })); return; }
@@ -149,7 +189,10 @@
       var when = r.createdAt && r.createdAt.toDate ? r.createdAt.toDate().toLocaleString() : "";
       var done = r.status === "done";
       var reply = "https://wa.me/" + waNumber(r.phone) + "?text=" + encodeURIComponent("Hello " + (r.name || "") + ", this is Marshal Fitness about your request" + (r.number ? " " + r.number : "") + (r.item && !r.items ? ": " + r.item : "") + ".");
-      var kindLabel = r.kind === "basket" ? "Basket" : r.kind === "helper" ? "Smart helper" : r.kind === "camera" ? "Room camera" : "Product";
+      var KINDS = { basket: "Basket", helper: "Smart helper", camera: "Room camera", gymplan: "Gym plan", room: "Ready room",
+        tradein: "Trade-in", design: "Machine design", savings: "Calculator" };
+      var kindLabel = KINDS[r.kind] || "Product";
+      var extra = window.MF_ADMIN_REQ_EXTRA ? window.MF_ADMIN_REQ_EXTRA(r) : null; // version 22: photos, gym plan, trade-in
       var itemsList = null;
       if (Array.isArray(r.items) && r.items.length) {
         itemsList = el("ol", { class: "req-items" });
@@ -168,6 +211,7 @@
         ]),
         el("div", { dir: "ltr", style: "text-align:left" }, [el("a", { href: "tel:" + r.phone, text: r.phone || "" })]),
         itemsList || (r.item ? el("div", { text: "Product: " + r.item }) : null),
+        extra,
         r.message ? el("details", null, [el("summary", { class: "muted", text: "Full WhatsApp message" }), el("div", { class: "msg", text: r.message })]) : null,
         el("div", { class: "row" }, [
           el("a", { class: "btn green small", href: reply, target: "_blank", rel: "noopener", text: "Reply on WhatsApp" }),

@@ -7,7 +7,7 @@
    (window.MF_APP); they download together and run in order. */
 (function () {
   "use strict";
-  var V = window.MF_V || "21";
+  var V = window.MF_V || "22";
   var APP_SCRIPTS = (window.MF_APP || []).map(function (f) { return f + "?v=" + V; });
   var WAIT_MS = 3500;       // longest wait for the database
   var WAIT_CACHED_MS = 2000; // shorter wait when we have the data from the last visit
@@ -17,7 +17,21 @@
 
   /* ---------- start the site scripts ---------- */
   function ready() {
+    window.MF_IS_READY = true;
     try { document.dispatchEvent(new Event("mf-ready")); } catch (e) { /* ignore */ }
+    // version 22: the extra tools load after the site is ready
+    var late = (window.MF_LATE || []).map(function (f) { return f + "?v=" + V; });
+    var left = late.length;
+    late.forEach(function (src) {
+      var s = document.createElement("script");
+      s.src = src;
+      s.async = false;
+      s.onload = s.onerror = function () {
+        left -= 1;
+        if (left === 0) { window.MF_LATE_READY = true; try { document.dispatchEvent(new Event("mf-late")); } catch (e) { /* ignore */ } }
+      };
+      document.body.appendChild(s);
+    });
   }
 
   function loadScripts(list) {
@@ -108,6 +122,10 @@
         window.TOUR_EDIT = d;
       } else if (doc.id === "holidays") {
         window.HOLIDAY_EDIT = d;
+      } else if (doc.id === "rooms" && Array.isArray(d.list)) {
+        window.ROOMS_EDIT = d.list;   // version 22: ready gym rooms from admin
+      } else if (doc.id === "money" && d) {
+        window.MONEY_EDIT = d;        // version 22: dollar rate and membership price for the calculator
       }
     });
   }
